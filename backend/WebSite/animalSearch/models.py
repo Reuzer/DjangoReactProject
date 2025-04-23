@@ -1,25 +1,22 @@
 from django.db import models
-from django.utils import timezone;
+from django.utils import timezone
+from django.urls import reverse
 from django.core.validators import MinLengthValidator, MinValueValidator, MaxValueValidator
+from django.contrib.auth.models import AbstractUser
 
 
-
-
-class User(models.Model):
-    name = models.CharField(max_length=30)
-    email = models.EmailField(unique=True)
-    password = models.CharField(
-        max_length=100,
-        validators=[MinLengthValidator(8)]
-    )
+class User(AbstractUser):
+    middle_name = models.CharField(max_length=30, verbose_name='Отчество')
+    photo = models.URLField()
+    email = models.EmailField(unique=True, verbose_name='Почта')
     phone = models.CharField(
         max_length=30,
-        validators=[MinLengthValidator(5)]    
+        validators=[MinLengthValidator(5)],
+        verbose_name='Номер телефона'
     )
-    registration_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        return self.last_name
     
     class Meta:
         verbose_name = 'Пользователь'
@@ -27,14 +24,19 @@ class User(models.Model):
 
 
 class Blog(models.Model):
-    picture = models.URLField
+    picture = models.URLField(verbose_name='Картинка')
     title = models.CharField(
         max_length=100,
-        validators=[MinLengthValidator(5)] 
+        validators=[MinLengthValidator(5),
+        ],
+        verbose_name='Заголовок' 
     )
-    description = models.TextField
-    short_desc = models.CharField(max_length=255)
-    post_date = models.DateTimeField(auto_now_add = True)
+    description = models.TextField(verbose_name='Описание')
+    short_desc = models.CharField(max_length=255, verbose_name='Превью')
+    post_date = models.DateTimeField(auto_now_add = True, verbose_name='Дата создания')
+
+    def __str__(self):
+        return self.title
 
     class Meta:
         verbose_name = 'Блог'
@@ -43,13 +45,13 @@ class Blog(models.Model):
 
 
 class Message(models.Model): 
-    sender = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='sent_messages', null=True)
-    receiver = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='received_messages', null=True)
-    text = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
+    sender_id = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='sent_messages', null=True, verbose_name='Отправитель')
+    receiver_id = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='received_messages', null=True, verbose_name='Получатель')
+    text = models.TextField(verbose_name='Текст')
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
 
     def __str__ (self):
-        return f'Сообщения {self.sender.name} отправленные к {self.receiver.name}'
+        return f'Сообщения {self.sender_id.last_name} отправленные к {self.receiver_id.last_name}'
     
     class Meta:
         verbose_name = 'Сообщение'
@@ -57,16 +59,19 @@ class Message(models.Model):
 
 
 class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    text = models.TextField
+    user_id = models.ForeignKey(User, on_delete=models.PROTECT, related_name='reviews', verbose_name='Пользователь')
+    photo = models.URLField()
+    text = models.TextField(verbose_name='Текст')
     rating = models.IntegerField(validators=[
         MinValueValidator(1),
         MaxValueValidator(5)
-    ])
-    date = models.DateTimeField(auto_now_add=True)
+    ],
+    verbose_name='Оценка'
+    )
+    date = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
 
     def __str__ (self):
-        return f'Отзыв от {self.user.name}'
+        return f'Отзыв от {self.user_id.last_name}'
     
     class Meta:
         verbose_name = 'Отзыв'
@@ -74,13 +79,13 @@ class Review(models.Model):
 
 
 class Notification(models.Model): 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    text = models.TextField
-    date = models.DateTimeField(auto_now_add=True)
-    read = models.BooleanField(default=False)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    text = models.TextField(verbose_name='Текст')
+    date = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
+    read = models.BooleanField(default=False, verbose_name='Прочитано?')
 
     def __str__ (self):
-        return f'Оповещение к пользователю {self.user.name}'
+        return f'Оповещение к пользователю {self.user_id.last_name}'
     
     class Meta:
         verbose_name = 'Оповещение'
@@ -88,7 +93,7 @@ class Notification(models.Model):
 
 
 class Pet_type(models.Model):
-    type_name = models.CharField(max_length=100)
+    type_name = models.CharField(max_length=100, verbose_name='Название')
 
     def __str__ (self):
         return self.type_name
@@ -99,8 +104,8 @@ class Pet_type(models.Model):
     
 
 class Breed(models.Model):
-    pet_type = models.ForeignKey(Pet_type, on_delete=models.CASCADE)
-    breed = models.CharField(max_length=100)
+    pet_type_id = models.ForeignKey(Pet_type, on_delete=models.CASCADE, verbose_name='Животное')
+    breed = models.CharField(max_length=100, verbose_name='Порода')
 
     def __str__ (self):
         return self.breed
@@ -125,37 +130,49 @@ class Pet_Report_Manager(models.Manager):
 
 
 class Pet_Report(models.Model):
-    user_id = models.ForeignKey(User, on_delete = models.CASCADE)
-    pet_type = models.ForeignKey(Pet_type, on_delete=models.SET_NULL, null=True)
-    color = models.CharField(max_length=100, null=True)
-    size = models.CharField(max_length=50)
-    special_marks = models.CharField(max_length=255)
-    picture = models.URLField(null=True)
-    public_date = models.DateTimeField(default=timezone.now)
-    change_date = models.DateTimeField(auto_now=True, null=True)
-    report_type = models.CharField(max_length=20, choices = Report_type.choices)
-    location = models.CharField(max_length=255)
-    description = models.CharField(max_length=255)
+    user_id = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name='Пользователь')
+    pet_type_id = models.ForeignKey(Pet_type, on_delete=models.SET_NULL, null=True, verbose_name='Животное')
+    title = models.CharField(max_length=255, verbose_name='Заголовок')
+    resolved = models.BooleanField(default=False, verbose_name='Закрыто?')
+    special_marks = models.CharField(max_length=255, verbose_name='Отличительные знаки')
+    picture = models.URLField(null=True, verbose_name='Картинка')
+    public_date = models.DateTimeField(default=timezone.now, verbose_name='Дата публикации')
+    change_date = models.DateTimeField(auto_now=True, null=True, verbose_name='Дата изменения')
+    report_type = models.CharField(max_length=20, choices = Report_type.choices, verbose_name='Статус')
+    location = models.CharField(max_length=255, verbose_name='Локация')
+    description = models.CharField(max_length=255, verbose_name='Описание')
 
     objects = Pet_Report_Manager()
 
+    def get_absolute_url(self):
+        return reverse("report_detail", kwargs={"pk": self.pk})
+    
+
     def __str__(self):
-        return f'Объявление пользователя: {self.user_id.name}, статус: {self.report_type}'
+        return f'Объявление пользователя: {self.user_id.last_name}, статус: {self.report_type}'
 
     class Meta:
         verbose_name = 'Объявление'
         verbose_name_plural = 'Объявления'
-        ordering=['-public-date']
+        ordering=['-public_date']
 
     #verbose_name
 class FavoriteReports(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite_reports')
-    reports = models.ManyToManyField(Pet_Report, related_name='favorited_by')
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite_reports', verbose_name='Пользователь')
+    reports = models.ManyToManyField(Pet_Report, related_name='favorited_by', verbose_name='Объявления')
 
     def __str__(self):
-        return f"Избранные объявления пользователя {self.user.name}"
+        return f"Избранные объявления пользователя {self.user_id.last_name}"
         
     class Meta:
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранные объявления'
+
+
+"""
+from animalSearch.models import Pet_Report
+
+report = Pet_Report.objects.first()
+print(report.get_absolute_url())  
+"""
 

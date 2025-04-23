@@ -1,0 +1,21 @@
+.Header {
+    margin-top: 24px;
+}
+
+.wrapper {
+    width: 100%;
+    max-width: 834px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+}
+
+.link {
+    text-decoration: none;
+    color: black;
+    font-size: 1.6em;
+}
+
+.link:hover {
+    color: rgb(22, 131, 5)
+}

@@ -1,0 +1,80 @@
+.wrapper {
+    position: relative;
+    width: 1000px;
+    height: 500px;
+    margin: 85px auto 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 6px;
+}
+
+.wrapper::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../../../assets/HomePageTitle.png');
+    background-color: rgba(0, 0, 0, 0.3);
+    background-blend-mode: multiply; 
+    background-size: cover;
+    background-position: center;
+    z-index: -1; /* Чтобы картинка была под содержимым */
+}
+
+.contentWrapper {
+    height: 170px;
+}
+
+.title {
+    font-weight: bold;
+    font-size: 2.6rem;
+    margin-bottom: 54px;
+    color: #FFFAFA
+}
+
+.subtitleWrapper {
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    width: 403px;
+    height: 84px;
+}
+
+.subTitle {
+    font-weight: bold;
+    font-size: 2rem;
+    color: white;
+}
+
+.links {
+    display: flex; /* Размещаем ссылки в ряд */
+    gap: 10px; /* Отступ между ссылками */
+    width: 185px;
+    height: 84px;
+    flex-wrap: wrap; /* Позволяет переносить элементы */
+    align-items: center; /* Выравнивание по центру */
+}
+
+.lost {
+    box-sizing: border-box;
+    text-decoration: none;
+    color: white;
+    background-color: #07800C;
+    padding: 8px 19px;
+    border-radius: 6px;
+}
+
+.found {
+    text-decoration: none;
+    color: black;
+    background-color: white;
+    padding: 8px 23px;
+    border-radius: 6px;
+}
+
