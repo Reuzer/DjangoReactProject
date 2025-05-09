@@ -1,0 +1,58 @@
+input {
+    padding: 10px;
+    border: 2px #07800C solid;
+    border-radius: 6px;
+}
+
+label {
+    font-size: 1.6rem;
+}
+
+button {
+    cursor: pointer;
+    padding: 15px;
+}
+
+.wrapper {
+    width: 100%;
+    max-width: 900px;
+    margin: 30px auto 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.options {
+    display: flex;
+    width: 400px;
+    justify-content: space-between;
+}
+
+.select {
+    padding: 10px;
+    border: 2px #07800C solid;
+    border-radius: 8px;
+}
+
+.reportType__wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 200px;
+}
+
+.lost {
+    border-radius: 8px;
+}
+
+.found {
+    border-radius: 8px;
+}
+
+.btn_submit {
+    border: 2px gray solid;
+    background-color: #07800C;
+    border-radius: 6px;
+    color: white;
+    width: 50%;
+    margin-left: 25%;
+}

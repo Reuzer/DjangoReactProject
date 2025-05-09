@@ -64,6 +64,7 @@
 .lost {
     box-sizing: border-box;
     text-decoration: none;
+    font-size: 1.6rem;
     color: white;
     background-color: #07800C;
     padding: 8px 19px;
@@ -72,6 +73,7 @@
 
 .found {
     text-decoration: none;
+    font-size: 1.6rem;
     color: black;
     background-color: white;
     padding: 8px 23px;

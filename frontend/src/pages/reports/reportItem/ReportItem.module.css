@@ -1,0 +1,39 @@
+.link {
+    text-decoration: none;
+    color: black;
+}
+
+.list__element {
+    border: 4px #F1EACF solid;
+    border-radius: 10px;
+    padding: 20px;
+    width: 400px;
+    list-style-type: none;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px
+}
+
+.photo {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.description {
+    font-size: 1.6rem;
+    margin-top: 10px;
+}
+
+.date {
+ margin-top: auto;
+ font-size: 1.4rem;
+ color: #393939
+}
