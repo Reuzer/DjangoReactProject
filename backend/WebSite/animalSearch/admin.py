@@ -128,11 +128,11 @@ class BreedAdmin(admin.ModelAdmin):
 @admin.register(Pet_Report)
 class PetReportAdmin(admin.ModelAdmin):
     list_display = ('title', 'report_type', 'pet_type_name', 'user_name', 'location', 'public_date', 'resolved')
-    list_filter = ('report_type', 'pet_type_id', 'public_date')
+    list_filter = ('report_type', 'breed_id', 'public_date')
     search_fields = ('description', 'location', 'user_id__first_name', 'title')
     date_hierarchy = 'public_date'
     readonly_fields = ('public_date', 'change_date')
-    raw_id_fields = ('user_id', 'pet_type_id')
+    raw_id_fields = ('user_id', 'breed_id')
     inlines = [FavoriteReportsInline]
 
     @admin.display(description="Тип питомца")

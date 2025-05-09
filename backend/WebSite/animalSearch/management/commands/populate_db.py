@@ -1,131 +1,113 @@
-import random
 from django.core.management.base import BaseCommand
+from animalSearch.models import *
+from django.utils import timezone
 from faker import Faker
-from animalSearch.models import (
-    User, Blog, Message, Review, Notification, Pet_type, Breed,
-    Pet_Report, FavoriteReports
-)
+import random
 
-fake = Faker("ru_RU")
+fake = Faker('ru_RU')
 
 
 class Command(BaseCommand):
-    help = "Создает фейковые данные для базы"
+    help = "Автоматическое заполнение базы данных фиктивными данными"
 
     def handle(self, *args, **kwargs):
-        self.stdout.write("Создание пользователей...")
-        users = self.create_users(10)
+        self.stdout.write("Заполнение базы данных...")
 
-        self.stdout.write("Создание блогов...")
+        self.create_users(10)
+        self.create_pet_types_and_breeds()
         self.create_blogs(10)
+        self.create_reviews(10)
+        self.create_messages(20)
+        self.create_notifications(10)
+        self.create_pet_reports(20)
+        self.create_favorite_reports(5)
 
-        self.stdout.write("Создание сообщений...")
-        self.create_messages(users, 10)
+        self.stdout.write("Готово.")
 
-        self.stdout.write("Создание отзывов...")
-        self.create_reviews(users, 10)
-
-        self.stdout.write("Создание уведомлений...")
-        self.create_notifications(users, 10)
-
-        self.stdout.write("Создание типов животных и пород...")
-        pet_types = self.create_pet_types_and_breeds()
-
-        self.stdout.write("Создание объявлений...")
-        self.create_pet_reports(users, pet_types, 10)
-
-        self.stdout.write("Создание избранных объявлений...")
-        self.create_favorite_reports(users, 5)
-
-        self.stdout.write(self.style.SUCCESS("✅ Фейковые данные успешно созданы!"))
-
-    def create_users(self, n):
-        users = []
-        for _ in range(n):
-            user = User(
-                username=fake.unique.user_name(),
+    def create_users(self, count):
+        for _ in range(count):
+            User.objects.create_user(
+                username=fake.user_name(),
+                password='password123',
+                email=fake.unique.email(),
                 first_name=fake.first_name(),
                 last_name=fake.last_name(),
-                middle_name=fake.first_name(),
-                photo = fake.image_url(),
-                email=fake.unique.email(),
-                phone=fake.phone_number()
+                middle_name=fake.middle_name(),
+                phone=fake.phone_number(),
+                photo=fake.image_url()
             )
-            user.set_password("testpassword123")  # безопасно устанавливаем пароль
-            user.save()
-            users.append(user)
-        return users
 
-    def create_blogs(self, n):
-        for _ in range(n):
+    def create_pet_types_and_breeds(self):
+        types = ['Собака', 'Кошка', 'Попугай', 'Хомяк']
+        for type_name in types:
+            pet_type = Pet_type.objects.create(type_name=type_name)
+            for _ in range(3):
+                Breed.objects.create(
+                    pet_type_id=pet_type,
+                    breed=fake.word().capitalize()
+                )
+
+    def create_blogs(self, count):
+        for _ in range(count):
             Blog.objects.create(
                 picture=fake.image_url(),
                 title=fake.sentence(nb_words=6),
-                description=fake.text(max_nb_chars=300),
-                short_desc=fake.sentence(nb_words=12)
+                description=fake.text(max_nb_chars=500),
+                short_desc=fake.text(max_nb_chars=100)
             )
 
-    def create_messages(self, users, n):
-        for _ in range(n):
+    def create_reviews(self, count):
+        users = User.objects.all()
+        for _ in range(count):
+            Review.objects.create(
+                user_id=random.choice(users),
+                photo=fake.image_url(),
+                text=fake.paragraph(nb_sentences=3),
+                rating=random.randint(1, 5)
+            )
+
+    def create_messages(self, count):
+        users = list(User.objects.all())
+        for _ in range(count):
             sender, receiver = random.sample(users, 2)
             Message.objects.create(
                 sender_id=sender,
                 receiver_id=receiver,
-                text=fake.text(max_nb_chars=50)
+                text=fake.text(max_nb_chars=200)
             )
 
-    def create_reviews(self, users, n):
-        for _ in range(n):
-            Review.objects.create(
-                user_id=random.choice(users),
-                photo = fake.image_url(),
-                text=fake.text(max_nb_chars=300),
-                rating=random.randint(1, 5)
-            )
+    def create_notifications(self, count):
+        for user in User.objects.all():
+            for _ in range(count // 2):
+                Notification.objects.create(
+                    user_id=user,
+                    text=fake.sentence(),
+                    read=random.choice([True, False])
+                )
 
-    def create_notifications(self, users, n):
-        for _ in range(n):
-            Notification.objects.create(
-                user_id=random.choice(users),
-                text=fake.text(max_nb_chars=50)
-            )
+    def create_pet_reports(self, count):
+        users = User.objects.all()
+        breeds = Breed.objects.all()
+        types = list(Report_type.values)
 
-    def create_pet_types_and_breeds(self):
-        pet_types = ["Собака", "Кошка", "Попугай", "Хомяк"]
-        breeds = {
-            "Собака": ["Лабрадор", "Овчарка", "Спаниель"],
-            "Кошка": ["Британец", "Сиамская", "Мейн-кун"],
-            "Попугай": ["Волнистый", "Ара", "Жако"],
-            "Хомяк": ["Джунгарик", "Сирийский", "Роборовский"]
-        }
-
-        pet_type_objs = {}
-        for pet in pet_types:
-            pet_type = Pet_type.objects.create(type_name=pet)
-            pet_type_objs[pet] = pet_type
-
-            for breed in breeds[pet]:
-                Breed.objects.create(pet_type_id=pet_type, breed=breed)
-
-        return list(pet_type_objs.values())
-
-    def create_pet_reports(self, users, pet_types, n):
-        for _ in range(n):
-            pet_type = random.choice(pet_types)
+        for _ in range(count):
             Pet_Report.objects.create(
                 user_id=random.choice(users),
-                pet_type_id=pet_type,
+                breed_id=random.choice(breeds),
                 title=fake.sentence(nb_words=6),
-                special_marks=fake.sentence(nb_words=8),
+                resolved=random.choice([True, False]),
+                special_marks=fake.word(),
                 picture=fake.image_url(),
-                report_type=random.choice(["lost", "found"]),
+                public_date=fake.date_time_this_year(),
+                report_type=random.choice(types),
                 location=fake.address(),
-                description=fake.text(max_nb_chars=100)
+                description=fake.text(max_nb_chars=200)
             )
 
-    def create_favorite_reports(self, users, n):
+    def create_favorite_reports(self, count):
+        users = User.objects.all()
         reports = list(Pet_Report.objects.all())
-        for user in users:
+        for _ in range(count):
+            user = random.choice(users)
             fav = FavoriteReports.objects.create(user_id=user)
-            if reports:
-                fav.reports.add(*random.sample(reports, min(n, len(reports))))
+            fav.reports.set(random.sample(reports, min(len(reports), random.randint(1, 5))))

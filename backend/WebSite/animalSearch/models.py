@@ -6,8 +6,8 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-    middle_name = models.CharField(max_length=30, verbose_name='Отчество')
-    photo = models.URLField()
+    middle_name = models.CharField(max_length=30, verbose_name='Отчество', blank=True)
+    photo = models.URLField(blank=True)
     email = models.EmailField(unique=True, verbose_name='Почта')
     phone = models.CharField(
         max_length=30,
@@ -60,7 +60,7 @@ class Message(models.Model):
 
 class Review(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.PROTECT, related_name='reviews', verbose_name='Пользователь')
-    photo = models.URLField()
+    photo = models.URLField(blank=True)
     text = models.TextField(verbose_name='Текст')
     rating = models.IntegerField(validators=[
         MinValueValidator(1),
@@ -131,7 +131,7 @@ class Pet_Report_Manager(models.Manager):
 
 class Pet_Report(models.Model):
     user_id = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name='Пользователь')
-    pet_type_id = models.ForeignKey(Pet_type, on_delete=models.SET_NULL, null=True, verbose_name='Животное')
+    breed_id = models.ForeignKey(Breed, on_delete=models.SET_NULL, null=True, verbose_name='Животное')
     title = models.CharField(max_length=255, verbose_name='Заголовок')
     resolved = models.BooleanField(default=False, verbose_name='Закрыто?')
     special_marks = models.CharField(max_length=255, verbose_name='Отличительные знаки')
