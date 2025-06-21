@@ -3,11 +3,23 @@ import './App.css'
 import { routesConfig } from './config/routes'
 import Header from './components/header/Header'
 import Footer from './components/footer/Footer'
+import { observer } from 'mobx-react-lite'
+import { useEffect } from 'react'
+import { authStore } from './stores/AuthStore'
 
 
 
 
-function App() {
+
+const App = observer(() => {
+
+  useEffect(() => {
+    // Проверяем токен при загрузке приложения
+    if (authStore.tokens?.access && !authStore.isAuth) {
+      authStore.refreshToken();
+    }
+  }, []);
+
   return (
     <BrowserRouter>
       <Header />
@@ -19,6 +31,6 @@ function App() {
       <Footer />
     </BrowserRouter>
   )
-}
+})
 
 export default App

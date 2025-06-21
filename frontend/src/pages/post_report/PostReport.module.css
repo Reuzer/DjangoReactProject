@@ -48,6 +48,13 @@ button {
     border-radius: 8px;
 }
 
+.description {
+    resize: none;
+    padding: 10px;
+    border: 2px #07800C solid;
+    border-radius: 6px;
+}
+
 .btn_submit {
     border: 2px gray solid;
     background-color: #07800C;

@@ -10,10 +10,6 @@ const Img: FC<Props> = ({className, photo, altPhoto}) => {
     
     const [imgSrc, setImgSrc] = useState(photo);
     
-    
-    console.log(photo);
-
-
     return (
         <>
             {imgSrc ?

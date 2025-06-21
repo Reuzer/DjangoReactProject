@@ -4,3 +4,21 @@
     flex-wrap: wrap;
     margin-top: 30px;
 }
+
+.ui_wrapper {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.input {
+    width: 80%;
+}
+
+.findButton {
+    background-color: #07800C;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}

@@ -3,6 +3,7 @@ import Reviews from "./reviews/Reviews";
 import Title from "./title/Title";
 
 const HomePage = () => {
+
     return (
         <div>
             <Title />

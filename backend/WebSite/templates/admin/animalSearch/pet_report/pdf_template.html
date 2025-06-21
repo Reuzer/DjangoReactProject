@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Отчёты о питомцах</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        .report {
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+        img {
+            max-width: 300px;
+            max-height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Отчёты о питомцах</h1>
+    {% for report in reports %}
+        <div class="report">
+            <h2>{{ report.title }}</h2>
+            {% if report.photo %}
+                <img src="{{ base_url }}{{ report.photo.url }}" alt="{{ report.title }}">
+            {% endif %}
+            <p><strong>Тип:</strong> {{ report.pet_type_name }}</p>
+            <p><strong>Описание:</strong> {{ report.description }}</p>
+            <p><strong>Дата:</strong> {{ report.public_date|date:"d.m.Y" }}</p>
+        </div>
+    {% endfor %}
+</body>
+</html>

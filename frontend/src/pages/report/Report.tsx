@@ -6,6 +6,8 @@ import styles from './Report.module.css'
 import Img from '../../components/Img/Img';
 import altPhoto from '../../assets/alter.svg';
 import { Modal } from "../../components/modal/Modal";
+import { authStore } from "../../stores/AuthStore";
+import api from "../../api/httpClient";
 
 const Report = () => {
 
@@ -20,9 +22,6 @@ const Report = () => {
     const fetching = async () => {
         const data = await ServiceApi.getReport(Number(id))
         if(data.status === 200) {
-            if(!data.data.picture) {
-                data.data.picture = 'no picture';
-            }
             setReport(data.data);
             setCurrentFormData({
                 user_id: data.data.user_id.id,
@@ -30,7 +29,7 @@ const Report = () => {
                 title: data.data.title,
                 resolved: data.data.resolved,
                 special_marks: data.data.special_marks,
-                picture: data.data.picture,
+                picture: data.data.picture ? data.data.picture : 'nopicture',
                 report_type: data.data.report_type,
                 location: data.data.location,
                 description: data.data.description
@@ -64,15 +63,43 @@ const Report = () => {
             return;
         }
 
-        async function putData () {
-            if(report) {
-               const response = await ServiceApi.updateReports(report.id, currentFormData!);
-               if(response.status === 200){
-                setReport(response.data)
-               }
+        
+
+
+        async function putData() {
+            if (report && currentFormData) {
+              const formData = new FormData();
+              
+              // Добавляем все поля в FormData
+              formData.append('title', currentFormData.title);
+              formData.append('special_marks', currentFormData.special_marks);
+              formData.append('location', currentFormData.location);
+              formData.append('description', currentFormData.description);
+              formData.append('breed_id', currentFormData.breed_id.toString());
+              formData.append('report_type', currentFormData.report_type);
+              formData.append('resolved', currentFormData.resolved.toString());
+              
+              // Если есть новое изображение (нужно добавить логику для загрузки файла)
+              if (currentFormData.picture && currentFormData.picture !== 'nopicture') {
+                // Здесь нужно добавить логику для загрузки файла
+                // formData.append('picture', fileObject);
+              } else if (currentFormData.picture === 'nopicture') {
+                formData.append('picture', ''); // Пустая строка для удаления изображения
+              }
+          
+              try {
+                const response = await api.put(`pet_reports/${id}/`, formData);
+                
+                if (response.status === 200) {
+                  setReport(response.data);
+                  setIsModalOpen(false);
+                }
+              } catch (error) {
+                console.error('Update error:', error);
+                // Обработка ошибки
+              }
             }
-            setIsModalOpen(false);
-        }
+          }
 
         putData();
     }   
@@ -81,18 +108,18 @@ const Report = () => {
         window.scroll(0, 0);
         fetching();
     }, [])
-    console.log(report);
+
     
     return (
         <div className={styles.wrapper}>
-            {report?.picture && <Img className={styles.photo} photo={report.picture} altPhoto={altPhoto}  />}
+            {report?.picture && <Img className={styles.photo} photo={'http://127.0.0.1:8000/' + report.picture} altPhoto={altPhoto}  />}
             <h2 className={styles.title}>{report?.title}</h2>
             <p className={styles.description}>{report?.description}</p>
             <p className={styles.special_marks}>{report?.special_marks}</p>
-            <div className={styles.btns}>
+            {authStore.user?.role == 'admin' || authStore.user?.id === report?.user_id.id && <div className={styles.btns}>
                 <button className={styles.edit} onClick={() => setIsModalOpen(true)}>Редактировать</button>
                 <button className={styles.delete} onClick={handleDeleteButton}>Удалить</button>
-            </div>
+            </div>}
             
                 <Modal 
                     isOpen={isModalOpen} 
@@ -118,8 +145,8 @@ const Report = () => {
                             onChange={(e) => setCurrentFormData({...currentFormData, location: e.target.value})}
                             />
                         <label htmlFor="description">Описание</label>
-                            <input 
-                            type="text" 
+                            <textarea
+                            className={styles.form_description}
                             value={currentFormData.description}
                             onChange={(e) => setCurrentFormData({...currentFormData, description: e.target.value})}
                             />

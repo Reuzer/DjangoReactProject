@@ -2,8 +2,10 @@
     width: 100%;
     background-color: #F7F7F7;
     padding-top: 67px;
-    margin-top: 218px;
+    position: relative;
+    bottom: 0;
     padding-bottom: 32px;
+    margin-top: 500px;
 }
 
 .navbar {
@@ -12,6 +14,9 @@
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
+    padding: 0 20px;
+    box-sizing: border-box;
+    flex-wrap: wrap;
 }
 
 .link_wrapper {
@@ -20,12 +25,15 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .vk {
     text-decoration: none;
     color: black;
     font-size: 1.6rem;
+    transition: color 0.3s ease;
 }
 
 .vk:hover {
@@ -36,6 +44,7 @@
     text-decoration: none;
     color: black;
     font-size: 1.6rem;
+    transition: color 0.3s ease;
 }
 
 .link:hover {
@@ -44,9 +53,9 @@
 
 .line {
     background-color: black;
-    width: 100%;
+    width: calc(100% - 40px);
     height: 0.5px;
-    margin-top: 33px;
+    margin: 33px auto 0 auto;
 }
 
 .info_wrapper {
@@ -54,8 +63,9 @@
     max-width: 400px;
     display: flex;
     justify-content: space-between;
-    margin-top: 32px;
-    margin-left: 1100px
+    margin: 32px auto 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .policy {
@@ -66,4 +76,69 @@
 .condition {
     font-size: 1.4rem;
     color: black;
+}
+
+/* Адаптивные стили */
+@media (max-width: 900px) {
+    .Footer {
+        padding-top: 50px;
+        margin-top: 150px;
+    }
+    
+    .navbar {
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+    }
+    
+    .link_wrapper {
+        justify-content: center;
+        gap: 25px;
+    }
+    
+    .info_wrapper {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .Footer {
+        padding-top: 40px;
+        margin-top: 120px;
+    }
+    
+    .link, .vk {
+        font-size: 1.4rem;
+    }
+    
+    .policy, .condition {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .Footer {
+        padding-top: 30px;
+        margin-top: 80px;
+    }
+    
+    .link_wrapper {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .link, .vk {
+        font-size: 1.3rem;
+    }
+    
+    .line {
+        width: calc(100% - 30px);
+        margin-top: 25px;
+    }
+    
+    .info_wrapper {
+        margin-top: 25px;
+    }
 }

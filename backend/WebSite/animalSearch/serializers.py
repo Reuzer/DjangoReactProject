@@ -1,6 +1,8 @@
 from rest_framework import serializers
-from .models import Pet_Report, Blog, Review, Pet_type, Breed, User
-from django.contrib.auth import authenticate
+from .models import *
+from django.contrib.auth import authenticate, get_user_model
+
+
 
 class UserReadSerializer (serializers.ModelSerializer):
 
@@ -14,7 +16,8 @@ class UserReadSerializer (serializers.ModelSerializer):
             'last_name',
             'middle_name',
             'photo',
-            'phone',     
+            'phone',
+            'role'     
         ]
         read_only_fields = ['id', 'email', 'username']
 
@@ -46,15 +49,18 @@ class ReviewReadSerializer(serializers.ModelSerializer):
     
 
 class ReviewWriteSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Review
-        fields = [
-            'user_id',
-            'photo',
-            'text',
-            'rating',
-        ]
+        fields = ['photo', 'text', 'rating']
+    
+    def create(self, validated_data):
+        # Исправленная строка - проверяем наличие request в контексте
+        if 'request' in self.context:
+            validated_data['user_id'] = self.context['request'].user
+        else:
+            # Для тестов можно установить пользователя по умолчанию
+            validated_data['user_id'] = User.objects.first()
+        return super().create(validated_data)
 
 
 class PetTypeSerializer(serializers.ModelSerializer):
@@ -77,6 +83,7 @@ class PetReportReadSerializer(serializers.ModelSerializer):
 
     user_id = UserReadSerializer(read_only = True)
     breed_id = BreedSerializer(read_only = True)
+    thumbnail = serializers.SerializerMethodField()
 
     class Meta:
         model = Pet_Report
@@ -87,16 +94,21 @@ class PetReportReadSerializer(serializers.ModelSerializer):
             'title',
             'resolved',
             'special_marks',
+            'thumbnail',
             'picture',
             'public_date',
             'report_type',
             'location',
             'description'
         ]
+
+    def get_thumbnail(self, obj):
+        if obj.picture:           
+            return f"{obj.picture.url}?width=400&height=400"
+        return None
     
 
 class PetReportWriteSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Pet_Report
         fields = [
@@ -110,6 +122,32 @@ class PetReportWriteSerializer(serializers.ModelSerializer):
             'location',
             'description'
         ]
+    
+    def validate(self, data):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            raise serializers.ValidationError("Требуется авторизация")
+
+        # Проверяем только при создании (не при обновлении)
+        if self.instance is None:
+            description = data.get('description', '').strip()
+
+            duplicate_exists = Pet_Report.objects.filter(
+                user_id=request.user,
+                description__iexact=description,
+                resolved=False
+            ).exists()
+
+            if duplicate_exists:
+                raise serializers.ValidationError({
+                    'non_field_errors': ['У вас уже есть активное объявление с таким же описанием и местоположением']
+                })
+
+        return data
+
+    def create(self, validated_data):
+        validated_data['user_id'] = self.context['request'].user
+        return super().create(validated_data)
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
 
@@ -119,7 +157,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'middle_name', 'phone']
+        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'middle_name', 'phone', 'photo']
         extra_kwargs = {"password":{"write_only": True}}
 
     def create(self, validated_data):
@@ -129,16 +167,72 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
 
 
-class UserLoginSerializer(serializers.ModelSerializer):
+class UserLoginSerializer(serializers.Serializer):  # ← Используем Serializer вместо ModelSerializer
     username = serializers.CharField()
-    password = serializers.CharField(write_only = True)
+    password = serializers.CharField(write_only=True)
 
-    def validate(self, data):
-        user = authenticate(**data)
-        if user and user.is_active:
-            return user
-        raise serializers.ValidationError('incorrect credentials')
+    def validate(self, attrs):
+        username = attrs.get('username')
+        password = attrs.get('password')
+
+        if username and password:
+            user = authenticate(request=self.context.get('request'),
+                                username=username, password=password)
+            
+            if not user:
+                raise serializers.ValidationError('Неверные учетные данные')
+            
+            if not user.is_active:
+                raise serializers.ValidationError('Аккаунт деактивирован')
+            
+            attrs['user'] = user
+            return attrs
         
+        raise serializers.ValidationError('Необходимо указать username и password')
+        
+
+class PetReportShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pet_Report
+        fields = ('id', 'title', 'created_at')  # добавьте нужные поля
+
+class FavoriteReportItemSerializer(serializers.ModelSerializer):
+    report = PetReportShortSerializer(read_only=True)
+    
+    class Meta:
+        model = FavoriteReportItem
+        fields = ('id', 'report', 'added_at')
+        read_only_fields = ('added_at',)
+
+class FavoriteReportsSerializer(serializers.ModelSerializer):
+    reports = PetReportShortSerializer(many=True, read_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = FavoriteReports
+        fields = ('id', 'user_id', 'reports')
+
+class AddToFavoriteSerializer(serializers.Serializer):
+    report_id = serializers.PrimaryKeyRelatedField(
+        queryset=Pet_Report.objects.all(),
+        source='report'
+    )
+
+    def create(self, validated_data):
+        favorite, _ = FavoriteReports.objects.get_or_create(
+            user_id=self.context['request'].user
+        )
+        report = validated_data['report']
+        
+        fav_item, created = FavoriteReportItem.objects.get_or_create(
+            favorite=favorite,
+            report=report
+        )
+        
+        if not created:
+            raise serializers.ValidationError("Это объявление уже в избранном")
+            
+        return fav_item
 
 
 """
