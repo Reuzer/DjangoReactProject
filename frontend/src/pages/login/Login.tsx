@@ -21,6 +21,7 @@ const Login = () => {
         await authStore.login(username, password);
         console.log(authStore.error);
         navigate('/');
+        location.reload()
     }
 
     console.log(authStore.isAuth)

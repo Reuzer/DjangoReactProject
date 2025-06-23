@@ -6,7 +6,7 @@ from .models import *
 
 User = get_user_model()
 
-class SimpleTests(APITestCase):
+class Tests(APITestCase):
     def setUp(self):
         # Создаем тестового пользователя
         self.user = User.objects.create_user(
