@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Экзамены</title>
+</head>
+<body>
+    <h1>Экзамены</h1>
+    <h2>Реунин Сергей Эдуардович — группа 231-323</h2>
+
+    {% if exams %}
+        <ul>
+            {% for exam in exams %}
+                <li>
+                    <strong>Название экзамена:</strong> {{ exam.name }}<br>
+                    <strong>Дата создания записи:</strong> {{ exam.created_at|date:"d.m.Y H:i" }}<br>
+                    <strong>Дата проведения:</strong> {{ exam.exam_date|date:"d.m.Y" }}<br>
+                    <strong>Изображение задания:</strong><br>
+                    {% if exam.image %}
+                        <img src="{{ exam.image.url }}" alt="Задание" style="max-width:300px;"><br>
+                    {% else %}
+                        <em>Изображение отсутствует</em><br>
+                    {% endif %}
+                    <strong>Студенты:</strong>
+                    <ul>
+                        {% for student in exam.students.all %}
+                            <li>{{ student.get_full_name }} ({{ student.email }})</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                <hr>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Опубликованных экзаменов нет.</p>
+    {% endif %}
+</body>
+</html>

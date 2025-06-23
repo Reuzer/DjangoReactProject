@@ -7,4 +7,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('animalSearch.urls')),
     path('silk/', include('silk.urls', namespace='silk')),
+    path('', include('srexam.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
