@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'animalSearch', 
+    'srexam',
     'rest_framework',
     'silk',
     'corsheaders',
