@@ -1,5 +1,5 @@
 from django.db import models
-from animalSearch.models import User;
+from animalSearch.models import User; #Так как в я менял класс User в settings.py (для приложения animalSearch, пользователя импортирую именно от туда)
 
 class ipexam(models.Model):
     name = models.CharField("Название экзамена", max_length=255)
