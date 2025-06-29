@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { Review, PetReport, Breed, PostPetReport, RegisterUser, PostReview } from "./types";
+import { Review, PetReport, Breed, PostPetReport, PostReview } from "./types";
 import api from "./httpClient";
 
 
