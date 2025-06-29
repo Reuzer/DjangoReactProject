@@ -1,0 +1,28 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 60%;
+    align-items: center;
+    margin: 30px auto 0 auto ;
+}
+
+.textArea {
+    resize: none;
+    width: 100%;
+    height: 200px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 2px #07800C solid;
+    
+}
+
+.stars {
+    display: flex;
+    gap: 6px;
+}
+
+.star:hover {
+    fill: #59d459;
+    cursor: pointer;
+}

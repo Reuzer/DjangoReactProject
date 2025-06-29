@@ -54,13 +54,9 @@ class ReviewWriteSerializer(serializers.ModelSerializer):
         fields = ['photo', 'text', 'rating']
     
     def create(self, validated_data):
-        # Исправленная строка - проверяем наличие request в контексте
-        if 'request' in self.context:
-            validated_data['user_id'] = self.context['request'].user
-        else:
-            # Для тестов можно установить пользователя по умолчанию
-            validated_data['user_id'] = User.objects.first()
-        return super().create(validated_data)
+        user = self.context['request'].user
+        review = Review.objects.create(user_id=user, **validated_data)
+        return review
 
 
 class PetTypeSerializer(serializers.ModelSerializer):

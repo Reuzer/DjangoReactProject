@@ -27,7 +27,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# Я знаю, что НЕЛЬЗЯ таким образом хранить секретный ключ, но учитывая, что данный проект никогда не будет проходить деплой, оставил его здесь
 SECRET_KEY = 'django-insecure-ix2rk$qd3+-=-qy56^y&&8(g^9y&s=e(1!@gvre-%3*z(0tzh&'
 
 # SECURITY WARNING: don't run with debug turned on in production!

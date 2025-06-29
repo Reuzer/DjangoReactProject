@@ -6,6 +6,8 @@ import Img from "../../../components/Img/Img";
 import alter from '../../../assets/alter.svg'
 import Stars from "../../../components/stars/Stars";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { authStore } from "../../../stores/AuthStore";
 
 const Reviews = () => {
     const [reviews, setReviews] = useState<Review[]>([]);
@@ -55,7 +57,7 @@ const Reviews = () => {
                         <li key={item.id} className={styles.container__element}>
                             <Img 
                                 className={styles.photo}
-                                photo={item.photo}
+                                photo = {'http://127.0.0.1:8000/' + item.photo}
                                 altPhoto={alter}
                             />
                             <p className={styles.name}>{[item.user_id.last_name, item.user_id.first_name].join(' ')}</p>
@@ -73,7 +75,11 @@ const Reviews = () => {
                     <FaChevronRight />
                 </button>
             </div>
-            <p className={styles.avg_rating}>Средний рейтинг: {avgRating}</p>
+            <div className={styles.btn_wrapper}>
+                <p className={styles.avg_rating}>Средний рейтинг: {avgRating}</p>
+                <Link className={styles.review__link} to={authStore.isAuth ? 'reports/post' : 'login'}>Оставить отзыв</Link>
+            </div>
+            
         </div>
     );
 }

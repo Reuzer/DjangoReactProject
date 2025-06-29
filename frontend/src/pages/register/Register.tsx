@@ -2,8 +2,11 @@ import styles from './Register.module.css';
 import { useState } from 'react';
 import { RegisterUser } from '../../api/types';
 import { authStore } from '../../stores/AuthStore';
+import { useNavigate } from 'react-router';
 
 const Register = () => {
+
+    const navigate = useNavigate();
     const [formData, setFormData] = useState<RegisterUser>({
         username: '',
         email: '',
@@ -22,6 +25,8 @@ const Register = () => {
       const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         await authStore.register(formData);
+        navigate('/')
+        location.reload();
       };
     
       return (

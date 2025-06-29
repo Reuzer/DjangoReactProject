@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { Review, PetReport, Breed, PostPetReport, RegisterUser } from "./types";
+import { Review, PetReport, Breed, PostPetReport, RegisterUser, PostReview } from "./types";
 import api from "./httpClient";
 
 
@@ -40,7 +40,7 @@ export default class ServiceApi {
     }
 
     static async deleteReport(id: number) {
-        await api.delete(`http://127.0.0.1:8000/api/pet_reports/${id}/`);
+        await api.delete(`pet_reports/${id}/`);
     }
 
     static async getBreeds(): Promise<AxiosResponse<Breed[]>> {
@@ -59,7 +59,12 @@ export default class ServiceApi {
     }
 
     static async getUserReports(): Promise<AxiosResponse<PetReport[]>> {
-        const response = await api.get(`http://127.0.0.1:8000/api/user/pet_reports/`);
+        const response = await api.get(`user/pet_reports/`);
         return response
+    }
+
+    static async postReview(data: PostReview) {
+        const response = await api.post('reviews/', data);
+        return response;
     }
 }

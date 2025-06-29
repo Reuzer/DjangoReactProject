@@ -33,6 +33,7 @@
 
 .container__element {
     min-width: 200px;
+    max-width: 25%;
     flex: 1;
     list-style-type: none;
     display: flex;
@@ -79,6 +80,20 @@
 
 .bar {
    margin-top: auto;
+}
+
+.btn_wrapper  {
+    display: flex;
+    justify-content: space-between;
+}
+
+.review__link {
+    text-decoration: none;
+    color: white;
+    background-color: #07800C;
+    padding: 10px;
+    font-size: 1.6rem;
+    border-radius: 6px;
 }
 
 /* Адаптивные стили */

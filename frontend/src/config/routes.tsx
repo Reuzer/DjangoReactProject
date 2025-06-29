@@ -7,6 +7,7 @@ import Blogs from "../pages/blogs/Blogs";
 import Login from "../pages/login/Login";
 import Profile from "../pages/profile/Profile";
 import Register from "../pages/register/Register";
+import PostReview from "../pages/post_review/PostReview";
 
 export const routesConfig: RouteObject[] = [
     {
@@ -40,5 +41,9 @@ export const routesConfig: RouteObject[] = [
     {
         path: '/register',
         element: <Register />
+    },
+    {
+        path: '/reports/post',
+        element: <PostReview />
     }
 ]

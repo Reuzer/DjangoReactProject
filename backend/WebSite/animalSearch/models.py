@@ -72,7 +72,7 @@ class Message(models.Model):
 
 class Review(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.PROTECT, related_name='reviews', verbose_name='Пользователь')
-    photo = models.URLField(blank=True)
+    photo = models.ImageField(upload_to='reviews/', blank=True)
     text = models.TextField(verbose_name='Текст')
     rating = models.IntegerField(validators=[
         MinValueValidator(1),

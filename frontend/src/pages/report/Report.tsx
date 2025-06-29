@@ -80,7 +80,7 @@ const Report = () => {
               formData.append('resolved', currentFormData.resolved.toString());
               
               // Если есть новое изображение (нужно добавить логику для загрузки файла)
-              if (currentFormData.picture && currentFormData.picture !== 'nopicture') {
+              if (currentFormData.picture && currentFormData.picture !== null) {
                 // Здесь нужно добавить логику для загрузки файла
                 // formData.append('picture', fileObject);
               } else if (currentFormData.picture === 'nopicture') {

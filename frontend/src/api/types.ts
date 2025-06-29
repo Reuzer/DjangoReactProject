@@ -64,6 +64,13 @@ export interface Review {
   date: string;
 }
 
+
+export interface PostReview {
+  photo: File | null;
+  text: string;
+  rating: 0 | 1 | 2 | 3 | 4 | 5;
+}
+
 export interface PostPetReport {
   user_id: number,
   breed_id: number,

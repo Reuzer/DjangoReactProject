@@ -17,7 +17,7 @@ const publicGetEndpoints = [
 ];
 
 api.interceptors.request.use(config => {
-  const path = config.url.replace(config.baseURL, '');
+  const path = config.url!.replace(config.baseURL!, '');
   const isPublicGet = config.method === 'get' && 
     publicGetEndpoints.some(pattern => 
       typeof pattern === 'string' ? path === pattern : pattern.test(path)

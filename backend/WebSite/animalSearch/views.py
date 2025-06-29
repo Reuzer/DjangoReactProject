@@ -177,7 +177,7 @@ class Review_List(APIView):
         Returns:
             Response: Созданный отзыв или ошибки валидации
         """
-        serializer = ReviewWriteSerializer(data=request.data)
+        serializer = ReviewWriteSerializer(data=request.data, context={'request': request})
 
         if serializer.is_valid():
             serializer.save()
